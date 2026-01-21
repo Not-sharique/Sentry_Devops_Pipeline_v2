@@ -1,0 +1,50 @@
+# Azure DevOps Pipeline for Python app with Sentry
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+variables:
+  pythonVersion: '3.8'
+
+steps:
+- task: UsePythonVersion@0
+  inputs:
+    versionSpec: $(pythonVersion)
+  displayName: 'Install Python'
+
+- script: pip install -r requirements.txt
+  displayName: 'Install dependencies'
+
+- script: python -m pytest
+  displayName: 'Run tests'
+  continueOnError: true  # Allow pipeline to continue even if tests fail
+
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '.'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/app.zip'
+    replaceExistingArchive: true
+  displayName: 'Archive files'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    pathToPublish: '$(Build.ArtifactStagingDirectory)/app.zip'
+    artifactName: 'drop'
+  displayName: 'Publish artifact'
+
+# Deployment to Azure Web App (optional, requires Azure subscription and service connection)
+- task: AzureWebApp@1
+  inputs:
+    azureSubscription: 'your-azure-subscription-service-connection'  # Replace with your service connection name
+    appType: 'webApp'
+    appName: 'your-web-app-name'  # Replace with your Azure Web App name
+    package: '$(Build.ArtifactStagingDirectory)/app.zip'
+    deploymentMethod: 'zipDeploy'
+  displayName: 'Deploy to Azure Web App'
+  env:
+    SENTRY_DSN: $(SENTRY_DSN)  # Set this as pipeline variable or in Azure Web App settings
