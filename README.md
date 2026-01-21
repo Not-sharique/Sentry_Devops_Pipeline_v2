@@ -22,7 +22,7 @@ This project demonstrates how to set up an Azure DevOps pipeline for a Python Fl
 1. Sign up for a Sentry account at [sentry.io](https://sentry.io).
 2. Create a new project:
    - Choose platform: Python
-   - Name your project (e.g., "sentry-ado-integration")
+   - Name your project (e.g., "sentry-ado-integration") hayyai-user-app
 3. After creation, copy the DSN from the project settings.
 
 ### 3. Azure DevOps Personal Access Token
